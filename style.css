@@ -1,0 +1,120 @@
+   * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial;
+        background: white;
+        color: black;
+    }
+
+    .container {
+        width: 95%;
+        margin: auto;
+    }
+
+    header {
+        background: red;
+        color: white;
+        padding: 10px;
+    }
+
+    header h1 {
+        margin: 0;
+    }
+
+    .menu {
+        margin-top: 10px;
+    }
+
+    .menu a {
+        color: white;
+        background: gray;
+        padding: 5px;
+        text-decoration: none;
+    }
+
+    .menu a:hover {
+        background: black;
+    }
+
+    main {
+        padding: 10px;
+    }
+
+    .card,
+    .form-card {
+        border: 1px solid black;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .event-card h2 {
+        color: blue;
+    }
+
+    .actions {
+        margin-top: 10px;
+    }
+
+    .btn {
+        background: gray;
+        color: white;
+        border: 1px solid black;
+        padding: 5px;
+        text-decoration: none;
+    }
+
+    .btn.secondary {
+        background: gray;
+    }
+
+    .btn.danger {
+        background: red;
+    }
+
+    label {
+        display: block;
+        margin-top: 10px;
+    }
+
+    input,
+    textarea {
+        width: 100%;
+        border: 1px solid black;
+        padding: 5px;
+    }
+
+    textarea {
+        height: 80px;
+    }
+
+    .form-actions {
+        margin-top: 10px;
+    }
+
+    .error {
+        background: red;
+        color: white;
+        padding: 5px;
+    }
+
+    .success {
+        background: green;
+        color: white;
+        padding: 5px;
+    }
+
+    .details dt {
+        font-weight: bold;
+    }
+
+    .details dd {
+        margin-left: 20px;
+    }
+
+    .empty {
+        border: 1px solid black;
+        padding: 10px;
+    }
