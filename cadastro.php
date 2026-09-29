@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($dados['capacidade'] !== '' && (int)$dados['capacidade'] < 1) {
         $erros[] = 'A capacidade deve ser maior que zero.';
-
+    }
     if (empty($erros)) {
         $id = $_SESSION['proximo_id'];
 
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: index.php');
         exit;
     }
-    }
+    
 }
 ?>
 <!DOCTYPE html>
