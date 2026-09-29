@@ -13,7 +13,7 @@ $dados = [
     'inicio' => '',
     'fim' => '',
     'local' => '',
-    'responsavel' => ''
+    'responsavel' => '',
     'capacidade' => ''
 ];
 
