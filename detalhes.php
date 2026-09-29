@@ -124,7 +124,7 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
                 <dd><?= e ($evento['capacidade']) ?></dd>
 
                 <dt>Vagas Disponíveis</dt>
-                <dd><?= e($evento['capacidade']) - count($evento['inscritos'])) ?></dd>
+                <dd><?= e($evento['capacidade'] - count($evento['inscritos'])) ?></dd>
 
             </dl>
 
