@@ -28,7 +28,7 @@ if (!isset($_SESSION['eventos'])) {
             'responsavel' => 'Profa. Ana',
             'capacidade' => 30,
             'inscritos' => []
-        ]
+        ],
     ];
 
     $_SESSION['proximo_id'] = 3;
