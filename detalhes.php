@@ -14,6 +14,11 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
     if (!isset($_SESSION['eventos'][$id]['inscritos'])) {
         $_SESSION['eventos'][$id]['inscritos'] = [];
     }
+
+     // Garante que eventos antigos tenham capacidade
+    if (!isset($_SESSION['eventos'][$id]['capacidade'])) {
+    $_SESSION['eventos'][$id]['capacidade'] = 30;
+}
     $evento = $_SESSION['eventos'][$id];
 
     $erros = [];
