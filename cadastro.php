@@ -14,6 +14,7 @@ $dados = [
     'fim' => '',
     'local' => '',
     'responsavel' => ''
+    'capacidade' => ''
 ];
 
 $erros = [];
@@ -30,6 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $erros[] = 'O horário final deve ser maior que o horário inicial.';
     }
 
+    if ($dados['capacidade'] !== '' && (int)$dados['capacidade'] < 1) {
+        $erros[] = 'A capacidade deve ser maior que zero.';
+
     if (empty($erros)) {
         $id = $_SESSION['proximo_id'];
 
@@ -42,7 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'inicio' => $dados['inicio'],
             'fim' => $dados['fim'],
             'local' => $dados['local'],
-            'responsavel' => $dados['responsavel']
+            'responsavel' => $dados['responsavel'],
+            'capacidade' => (int)$dados['capacidade'],
+            'inscritos' => []
         ];
 
         $_SESSION['proximo_id']++;
@@ -104,6 +110,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <label for="responsavel">Responsável</label>
             <input id="responsavel" name="responsavel" type="text" value="<?= e($dados['responsavel']) ?>" required>
+
+            <label for="capacidade">Capacidade máxima</label>
+            <input
+                type="number"
+                id="capacidade"
+                name="capacidade"
+                min="1"
+                value="<?= e($dados['capacidade']) ?>"
+                required
+            >
 
             <div class="form-actions">
                 <button class="btn" type="submit">Cadastrar</button>
