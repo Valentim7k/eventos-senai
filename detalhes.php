@@ -48,6 +48,10 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
             }
         }
 
+        if (count($_SESSION['eventos'][$id]['inscritos']) >= $_SESSION['eventos'][$id]['capacidade']) {
+    $erros[] = 'Este evento está lotado.';
+}
+
         // Se não houver erros, salva a inscrição
         if (empty($erros)) {
 
