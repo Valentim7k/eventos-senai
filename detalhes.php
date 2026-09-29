@@ -10,12 +10,11 @@ $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
     $erro = 'Evento não encontrado.';
 } else {
-    $evento = $_SESSION['eventos'][$id];
-
     // Garante que eventos antigos tenham a lista de inscritos
     if (!isset($_SESSION['eventos'][$id]['inscritos'])) {
         $_SESSION['eventos'][$id]['inscritos'] = [];
     }
+    $evento = $_SESSION['eventos'][$id];
 
     $erros = [];
 
