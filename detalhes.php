@@ -120,6 +120,12 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
                 <dt>Responsável</dt>
                 <dd><?= e($evento['responsavel']) ?></dd>
 
+                <dt>Capacidade</dt>
+                <dd><?= e ($evento['capacidade']) ?></dd>
+
+                <dt>Vagas Disponíveis</dt>
+                <dd><?= e($evento['capacidade']) - count($evento['inscritos'])) ?></dd>
+
             </dl>
 
         </section>
