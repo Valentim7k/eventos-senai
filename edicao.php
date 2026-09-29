@@ -20,7 +20,7 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
         if ($idPost === false || $idPost === null || !isset($_SESSION['eventos'][$idPost]) || $idPost !== $id) {
             $erros[] = 'ID do evento inválido.';
         } else {
-            $campos = ['titulo', 'descricao', 'area', 'data', 'inicio', 'fim', 'local', 'responsavel'];
+            $campos = ['titulo', 'descricao', 'area', 'data', 'inicio', 'fim', 'local', 'responsavel', 'capacidade'];
 
             foreach ($campos as $campo) {
                 $dados[$campo] = trim($_POST[$campo] ?? '');
@@ -32,6 +32,10 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
 
             if ($dados['inicio'] !== '' && $dados['fim'] !== '' && $dados['fim'] <= $dados['inicio']) {
                 $erros[] = 'O horário final deve ser maior que o horário inicial.';
+            }
+
+            if ($dados['capacidade'] !== '' && (int)$dados['capacidade'] < 1) {
+                $erros[] = 'A capacidade deve ser maior que zero.';
             }
 
             if (empty($erros)) {
@@ -104,6 +108,16 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
 
                 <label for="responsavel">Responsável</label>
                 <input id="responsavel" name="responsavel" type="text" value="<?= e($dados['responsavel']) ?>" required>
+
+                <label for="capacidade">Capacidade máxima</label>
+                <input
+                    type="number"
+                    id="capacidade"
+                    name="capacidade"
+                    min="1"
+                    value="<?= e ($dados['capacidade']) ?>"
+                    required
+                >
 
                 <div class="form-actions">
                     <button class="btn" type="submit">Salvar alterações</button>
