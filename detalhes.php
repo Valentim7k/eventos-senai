@@ -12,8 +12,9 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
 } else {
     $evento = $_SESSION['eventos'][$id];
 
-    if (!isset($evento['inscritos'])) {
-        $evento['inscritos'] = [];
+    // Garante que eventos antigos tenham a lista de inscritos
+    if (!isset($_SESSION['eventos'][$id]['inscritos'])) {
+        $_SESSION['eventos'][$id]['inscritos'] = [];
     }
 
     $erros = [];
@@ -23,24 +24,29 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
         $nome = trim($_POST['nome'] ?? '');
         $email = trim($_POST['email'] ?? '');
 
+        // Validação do nome
         if ($nome === '') {
             $erros[] = 'O nome é obrigatório.';
         }
 
+        // Validação do e-mail
         if ($email === '') {
             $erros[] = 'O e-mail é obrigatório.';
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $erros[] = 'Informe um e-mail válido.';
         }
 
-        foreach ($evento['inscritos'] as $inscrito) {
+        // Verifica e-mail duplicado neste evento
+        foreach ($_SESSION['eventos'][$id]['inscritos'] as $inscrito) {
             if (strcasecmp($inscrito['email'], $email) === 0) {
                 $erros[] = 'Este e-mail já está inscrito neste evento.';
                 break;
             }
         }
 
+        // Se não houver erros, salva a inscrição
         if (empty($erros)) {
+
             $_SESSION['eventos'][$id]['inscritos'][] = [
                 'nome' => $nome,
                 'email' => $email
@@ -49,6 +55,9 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
             header('Location: detalhes.php?id=' . $id);
             exit;
         }
+
+        // Atualiza o evento depois da tentativa de inscrição
+        $evento = $_SESSION['eventos'][$id];
     }
 }
 ?>
@@ -60,7 +69,9 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
     <title>Detalhes do evento</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+
 <header>
     <div class="container">
         <h1>Detalhes do evento</h1>
@@ -69,14 +80,23 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
 </header>
 
 <main class="container">
+
     <?php if (isset($erro)): ?>
-        <div class="error"><?= e($erro) ?></div>
+
+        <div class="error">
+            <?= e($erro) ?>
+        </div>
+
         <a class="btn" href="index.php">Voltar</a>
+
     <?php else: ?>
+
         <section class="card">
+
             <h2><?= e($evento['titulo']) ?></h2>
 
             <dl class="details">
+
                 <dt>ID</dt>
                 <dd><?= e($evento['id']) ?></dd>
 
@@ -100,70 +120,125 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
 
                 <dt>Responsável</dt>
                 <dd><?= e($evento['responsavel']) ?></dd>
+
             </dl>
 
-            <h3>Inscrição</h3>
-
-<?php if (!empty($erros)): ?>
-    <div class="error">
-        <?php foreach ($erros as $erro): ?>
-            <p><?= e($erro) ?></p>
-        <?php endforeach; ?>
-    </div>
-<?php endif; ?>
-
-<form method="POST" class="card">
-
-    <label for="nome">Nome:</label>
-    <input
-        type="text"
-        id="nome"
-        name="nome"
-        required
-        value="<?= e($_POST['nome'] ?? '') ?>"
-    >
-
-    <label for="email">E-mail:</label>
-    <input
-        type="email"
-        id="email"
-        name="email"
-        required
-        value="<?= e($_POST['email'] ?? '') ?>"
-    >
-
-    <button type="submit" class="btn">
-        Inscrever-se
-    </button>
-
-</form>
-
-            <h3>Inscritos</h3>
-
-<?php if (empty($evento['inscritos'])): ?>
-
-    <p>Nenhum participante inscrito.</p>
-
-<?php else: ?>
-
-    <ul>
-        <?php foreach ($evento['inscritos'] as $inscrito): ?>
-            <li>
-                <?= e($inscrito['nome']) ?>
-                — <?= e($inscrito['email']) ?>
-            </li>
-        <?php endforeach; ?>
-    </ul>
-
-<?php endif; ?>
-
-            <div class="actions">
-                <a class="btn secondary" href="edicao.php?id=<?= e($evento['id']) ?>">Editar</a>
-                <a class="btn danger" href="remocao.php?id=<?= e($evento['id']) ?>">Remover</a>
-                <a class="btn" href="index.php">Voltar</a>
-            </div>
         </section>
+
+
+        <!-- FORMULÁRIO DE INSCRIÇÃO -->
+
+        <section class="card">
+
+            <h2>Inscrição no evento</h2>
+
+            <?php if (!empty($erros)): ?>
+
+                <div class="error">
+
+                    <?php foreach ($erros as $erroInscricao): ?>
+
+                        <p><?= e($erroInscricao) ?></p>
+
+                    <?php endforeach; ?>
+
+                </div>
+
+            <?php endif; ?>
+
+
+            <form method="POST">
+
+                <label for="nome">Nome:</label>
+
+                <input
+                    type="text"
+                    id="nome"
+                    name="nome"
+                    value="<?= e($_POST['nome'] ?? '') ?>"
+                    required
+                >
+
+
+                <label for="email">E-mail:</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value="<?= e($_POST['email'] ?? '') ?>"
+                    required
+                >
+
+
+                <button type="submit" class="btn">
+                    Inscrever-se
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <!-- LISTA DE INSCRITOS -->
+
+        <section class="card">
+
+            <h2>Participantes inscritos</h2>
+
+            <?php if (empty($evento['inscritos'])): ?>
+
+                <p>Nenhum participante inscrito.</p>
+
+            <?php else: ?>
+
+                <ul>
+
+                    <?php foreach ($evento['inscritos'] as $inscrito): ?>
+
+                        <li>
+                            <?= e($inscrito['nome']) ?>
+                            -
+                            <?= e($inscrito['email']) ?>
+                        </li>
+
+                    <?php endforeach; ?>
+
+                </ul>
+
+            <?php endif; ?>
+
+        </section>
+
+
+        <div class="actions">
+
+            <a
+                class="btn secondary"
+                href="edicao.php?id=<?= e($evento['id']) ?>"
+            >
+                Editar
+            </a>
+
+            <a
+                class="btn danger"
+                href="remocao.php?id=<?= e($evento['id']) ?>"
+            >
+                Remover
+            </a>
+
+            <a
+                class="btn"
+                href="index.php"
+            >
+                Voltar
+            </a>
+
+        </div>
+
     <?php endif; ?>
+
 </main>
+
 </body>
 </html>
