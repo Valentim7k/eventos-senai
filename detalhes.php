@@ -337,7 +337,7 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
 
 
         <div class="actions">
-            <?php if ($evento['status'] === 'atibo'): ?>
+            <?php if ($evento['status'] === 'ativo'): ?>
             <a
                 class="btn danger"
                 href="status.php?id=<?= e($evento['id']) ?>"
