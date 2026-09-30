@@ -8,60 +8,83 @@ function e($valor) {
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
 if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
+
     $erro = 'Evento não encontrado.';
+
 } else {
+
     // Garante que eventos antigos tenham a lista de inscritos
     if (!isset($_SESSION['eventos'][$id]['inscritos'])) {
         $_SESSION['eventos'][$id]['inscritos'] = [];
     }
 
-     // Garante que eventos antigos tenham capacidade
+    // Garante que eventos antigos tenham capacidade
     if (!isset($_SESSION['eventos'][$id]['capacidade'])) {
-    $_SESSION['eventos'][$id]['capacidade'] = 30;
-}
+        $_SESSION['eventos'][$id]['capacidade'] = 30;
+    }
+
+    // Garante que eventos antigos tenham status
+    if (!isset($_SESSION['eventos'][$id]['status'])) {
+        $_SESSION['eventos'][$id]['status'] = 'ativo';
+    }
+
     $evento = $_SESSION['eventos'][$id];
 
     $erros = [];
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-        $nome = trim($_POST['nome'] ?? '');
-        $email = trim($_POST['email'] ?? '');
+        // Impede inscrição em evento cancelado
+        if ($_SESSION['eventos'][$id]['status'] === 'cancelado') {
 
-        // Validação do nome
-        if ($nome === '') {
-            $erros[] = 'O nome é obrigatório.';
-        }
+            $erros[] = 'Este evento está cancelado e não aceita novas inscrições.';
 
-        // Validação do e-mail
-        if ($email === '') {
-            $erros[] = 'O e-mail é obrigatório.';
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $erros[] = 'Informe um e-mail válido.';
-        }
+        } else {
 
-        // Verifica e-mail duplicado neste evento
-        foreach ($_SESSION['eventos'][$id]['inscritos'] as $inscrito) {
-            if (strcasecmp($inscrito['email'], $email) === 0) {
-                $erros[] = 'Este e-mail já está inscrito neste evento.';
-                break;
+            $nome = trim($_POST['nome'] ?? '');
+            $email = trim($_POST['email'] ?? '');
+
+            // Validação do nome
+            if ($nome === '') {
+                $erros[] = 'O nome é obrigatório.';
             }
-        }
 
-        if (count($_SESSION['eventos'][$id]['inscritos']) >= $_SESSION['eventos'][$id]['capacidade']) {
-    $erros[] = 'Este evento está lotado.';
-}
+            // Validação do e-mail
+            if ($email === '') {
+                $erros[] = 'O e-mail é obrigatório.';
+            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $erros[] = 'Informe um e-mail válido.';
+            }
 
-        // Se não houver erros, salva a inscrição
-        if (empty($erros)) {
+            // Verifica e-mail duplicado neste evento
+            foreach ($_SESSION['eventos'][$id]['inscritos'] as $inscrito) {
 
-            $_SESSION['eventos'][$id]['inscritos'][] = [
-                'nome' => $nome,
-                'email' => $email
-            ];
+                if (strcasecmp($inscrito['email'], $email) === 0) {
 
-            header('Location: detalhes.php?id=' . $id);
-            exit;
+                    $erros[] = 'Este e-mail já está inscrito neste evento.';
+                    break;
+                }
+            }
+
+            // Verifica limite de vagas
+            if (
+                count($_SESSION['eventos'][$id]['inscritos'])
+                >= $_SESSION['eventos'][$id]['capacidade']
+            ) {
+                $erros[] = 'Este evento está lotado.';
+            }
+
+            // Se não houver erros, salva a inscrição
+            if (empty($erros)) {
+
+                $_SESSION['eventos'][$id]['inscritos'][] = [
+                    'nome' => $nome,
+                    'email' => $email
+                ];
+
+                header('Location: detalhes.php?id=' . $id);
+                exit;
+            }
         }
 
         // Atualiza o evento depois da tentativa de inscrição
@@ -69,22 +92,37 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>Detalhes do evento</title>
+
     <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
 <header>
+
     <div class="container">
+
         <h1>Detalhes do evento</h1>
+
         <?php require 'menu.php'; ?>
+
     </div>
+
 </header>
 
 <main class="container">
@@ -92,48 +130,93 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
     <?php if (isset($erro)): ?>
 
         <div class="error">
+
             <?= e($erro) ?>
+
         </div>
 
-        <a class="btn" href="index.php">Voltar</a>
+        <a class="btn" href="index.php">
+            Voltar
+        </a>
 
     <?php else: ?>
 
         <section class="card">
 
-            <h2><?= e($evento['titulo']) ?></h2>
+            <h2>
+                <?= e($evento['titulo']) ?>
+            </h2>
 
             <dl class="details">
 
                 <dt>ID</dt>
-                <dd><?= e($evento['id']) ?></dd>
+
+                <dd>
+                    <?= e($evento['id']) ?>
+                </dd>
 
                 <dt>Descrição</dt>
-                <dd><?= nl2br(e($evento['descricao'])) ?></dd>
+
+                <dd>
+                    <?= nl2br(e($evento['descricao'])) ?>
+                </dd>
 
                 <dt>Área</dt>
-                <dd><?= e($evento['area']) ?></dd>
+
+                <dd>
+                    <?= e($evento['area']) ?>
+                </dd>
 
                 <dt>Data</dt>
-                <dd><?= e($evento['data']) ?></dd>
+
+                <dd>
+                    <?= e($evento['data']) ?>
+                </dd>
 
                 <dt>Início</dt>
-                <dd><?= e($evento['inicio']) ?></dd>
+
+                <dd>
+                    <?= e($evento['inicio']) ?>
+                </dd>
 
                 <dt>Fim</dt>
-                <dd><?= e($evento['fim']) ?></dd>
+
+                <dd>
+                    <?= e($evento['fim']) ?>
+                </dd>
 
                 <dt>Local</dt>
-                <dd><?= e($evento['local']) ?></dd>
+
+                <dd>
+                    <?= e($evento['local']) ?>
+                </dd>
 
                 <dt>Responsável</dt>
-                <dd><?= e($evento['responsavel']) ?></dd>
+
+                <dd>
+                    <?= e($evento['responsavel']) ?>
+                </dd>
 
                 <dt>Capacidade</dt>
-                <dd><?= e ($evento['capacidade']) ?></dd>
+
+                <dd>
+                    <?= e($evento['capacidade']) ?>
+                </dd>
 
                 <dt>Vagas Disponíveis</dt>
-                <dd><?= e($evento['capacidade'] - count($evento['inscritos'])) ?></dd>
+
+                <dd>
+                    <?= e(
+                        $evento['capacidade']
+                        - count($evento['inscritos'])
+                    ) ?>
+                </dd>
+
+                <dt>Status</dt>
+
+                <dd>
+                    <?= e($evento['status']) ?>
+                </dd>
 
             </dl>
 
@@ -152,7 +235,9 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
 
                     <?php foreach ($erros as $erroInscricao): ?>
 
-                        <p><?= e($erroInscricao) ?></p>
+                        <p>
+                            <?= e($erroInscricao) ?>
+                        </p>
 
                     <?php endforeach; ?>
 
@@ -161,35 +246,59 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
             <?php endif; ?>
 
 
-            <form method="POST">
+            <?php if ($evento['status'] === 'cancelado'): ?>
 
-                <label for="nome">Nome:</label>
+                <p>
+                    Este evento está cancelado e não aceita novas inscrições.
+                </p>
 
-                <input
-                    type="text"
-                    id="nome"
-                    name="nome"
-                    value="<?= e($_POST['nome'] ?? '') ?>"
-                    required
-                >
+            <?php elseif (
+                count($evento['inscritos'])
+                >= $evento['capacidade']
+            ): ?>
 
+                <p>
+                    Este evento está lotado e não aceita novas inscrições.
+                </p>
 
-                <label for="email">E-mail:</label>
+            <?php else: ?>
 
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value="<?= e($_POST['email'] ?? '') ?>"
-                    required
-                >
+                <form method="POST">
 
+                    <label for="nome">
+                        Nome:
+                    </label>
 
-                <button type="submit" class="btn">
-                    Inscrever-se
-                </button>
+                    <input
+                        type="text"
+                        id="nome"
+                        name="nome"
+                        value="<?= e($_POST['nome'] ?? '') ?>"
+                        required
+                    >
 
-            </form>
+                    <label for="email">
+                        E-mail:
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value="<?= e($_POST['email'] ?? '') ?>"
+                        required
+                    >
+
+                    <button
+                        type="submit"
+                        class="btn"
+                    >
+                        Inscrever-se
+                    </button>
+
+                </form>
+
+            <?php endif; ?>
 
         </section>
 
@@ -202,7 +311,9 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
 
             <?php if (empty($evento['inscritos'])): ?>
 
-                <p>Nenhum participante inscrito.</p>
+                <p>
+                    Nenhum participante inscrito.
+                </p>
 
             <?php else: ?>
 
@@ -226,6 +337,23 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
 
 
         <div class="actions">
+            <?php if ($evento['status'] === 'ativo'): ?>
+            <a
+                class="btn danger"
+                href="status.php?id=<?= e($evento['id']) ?>"
+            >
+                Cancelar Evento
+            </a>
+
+            <?php else: ?>
+            <a
+                class="btn"
+                href="status.php?id=<?= e($evento['id']) ?>"
+             >
+                Reativar evento
+            </a>
+
+            <?php endif; ?>
 
             <a
                 class="btn secondary"
@@ -255,4 +383,5 @@ if ($id === false || $id === null || !isset($_SESSION['eventos'][$id])) {
 </main>
 
 </body>
+
 </html>
