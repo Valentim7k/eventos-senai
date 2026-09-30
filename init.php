@@ -14,7 +14,8 @@ if (!isset($_SESSION['eventos'])) {
             'local' => 'Laboratório 1',
             'responsavel' => 'Prof. Carlos',
             'capacidade' => 30,
-            'inscritos' => []
+            'inscritos' => [],
+            'status' => 'ativo'
         ],
         2 => [
             'id' => 2,
@@ -27,7 +28,8 @@ if (!isset($_SESSION['eventos'])) {
             'local' => 'Laboratório 2',
             'responsavel' => 'Profa. Ana',
             'capacidade' => 30,
-            'inscritos' => []
+            'inscritos' => [],
+            'status' => 'ativo'
         ],
     ];
 
